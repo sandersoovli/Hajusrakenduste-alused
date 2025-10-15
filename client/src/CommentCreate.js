@@ -1,0 +1,35 @@
+import axios from "axios";
+import { useState } from "react";
+
+const CommentCreate = ({postid}) =>{
+    const[content, setContent] = useState('')
+    
+    const onChange = (event) =>{
+        setContent(event.target.value)
+    } 
+
+    const onSubmit = async (event) =>{
+        event.preventDefault()
+        await axios.post(`http://localhost:5000/posts/${postid}/comments`, {content})
+        setContent('')
+    } 
+
+    return (
+  <div>
+    <form onSubmit={onSubmit}>
+      <div className="form-group">
+        <label>New Comment</label>
+        <input
+          value={content}
+          onChange={onChange}
+          className="form-control"
+        /> 
+      </div>
+      <button className="btn btn-primary">Submit</button>
+    </form>
+  </div>
+)
+
+} 
+
+export default CommentCreate
