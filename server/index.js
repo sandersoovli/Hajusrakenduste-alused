@@ -1,4 +1,4 @@
-const express = require('express');  // õige nimi
+const express = require('express');
 const { randomBytes } = require('node:crypto');
 const cors = require('cors');
 

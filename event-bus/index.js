@@ -12,12 +12,19 @@ app.post('/events', (req, res) =>{
 
     console.log('Received Event:', event.type);
 
+    // Saada sündmus Postituste teenusele
     axios.post('http://localhost:5000/events', event).catch((err) =>{
         console.log('Error forwarding event to posts service:', err.message);
     });
 
+    // Saada sündmus Kommentaaride teenusele
     axios.post('http://localhost:5001/events', event).catch((err) =>{
         console.log('Error forwarding event to comments service:', err.message);
+    });
+
+    // UUS LISANDUS: Saada sündmus Query teenusele
+    axios.post('http://localhost:5002/events', event).catch((err) =>{
+        console.log('Error forwarding event to query service:', err.message);
     });
 
 
@@ -30,4 +37,4 @@ app.get('/events', (req, res) =>{
 
 app.listen(5005, () =>{
     console.log('event-bus  service running on http://localhost:5005');
-})
+});

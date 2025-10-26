@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import CommentsList from './CommentList';
-import CommentsCreate from './CommentCreate';
+import CommentCreate from './CommentCreate'; // Kasutan CommentsCreate asemel CommentCreate
 
 const PostList = () => {
-    const [posts, setPosts] = useState([]);
+    const [posts, setPosts] = useState({}); // Muutsin algse väärtuse objektiks, et sobituda Query teenuse andmestruktuuriga
     
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/posts');
+                // MUUTUS 1: Pärime andmed Query-teenuselt (5002)
+                const res = await axios.get('http://localhost:5002/posts'); 
                 setPosts(res.data);
             } catch (err) {
                 console.error(err);
@@ -20,12 +21,16 @@ const PostList = () => {
 
     console.log(posts);
 
-    const postsForRender = posts.map(post => (
+    // MUUTUS 2: Käsitseme posts andmeid kui objekti ja teisendame massiiviks
+    const postsForRender = Object.values(posts).map(post => (
         <div className="card" style={{ width: '30%', marginBottom: '20px'}} key={post.id}>
             <div className="card-body">
                 <h3>{post.title}</h3>
-                <CommentsList postId={post.id} /> 
-                <CommentsCreate postId={post.id} /> 
+                
+                {/* MUUTUS 3: Edastame Query-teenuselt saadud kommentaarid otse prop'ina CommentsListile */}
+                <CommentsList postId={post.id} comments={post.comments} /> 
+                
+                <CommentCreate postId={post.id} /> 
             </div>
         </div>
     ));

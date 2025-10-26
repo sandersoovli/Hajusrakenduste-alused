@@ -10,6 +10,7 @@ const CommentCreate = ({postId}) =>{
 
     const onSubmit = async (event) =>{
         event.preventDefault()
+        // KONTROLL: Päring tehakse õigele kommentaaride teenusele (5001)
         await axios.post(`http://localhost:5001/posts/${postId}/comments`, { content })
         setContent('')
     } 
