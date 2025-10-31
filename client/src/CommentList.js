@@ -1,16 +1,26 @@
 import React from "react";
-// Eemalda useEffect ja useState, kuna andmed tulevad PostListilt
-// Eemalda axios, kuna see ei ole enam vajalik
 
-// MUUTUS: Komponent võtab nüüd vastu ka 'comments' prop'i, mis sisaldab kommentaaride massiivi
 const CommentList = ({ comments }) => { 
   
-  // Kommentaaride massiiv peaks olema juba olemas ja korrektne. 
-  // Kontrollime, et 'comments' on massiiv ja kuvame need.
-  // Kasutame 'comments' otse, mitte useState muutuja.
-  const renderedComments = comments && comments.map((comment) => (
-    <li key={comment.id}>{comment.content}</li>
-  ));
+  const renderedComments = comments && comments.map((comment) => {
+    let content;
+
+    if (comment.status === 'approved') {
+        content = comment.content;
+    } else if (comment.status === 'pending') {
+        // Muutus 1: Kuvame 'pending' staatuse
+        content = 'This comment is awaiting moderation.';
+    } else if (comment.status === 'rejected') {
+        // Muutus 2: Kuvame 'rejected' staatuse
+        content = 'This comment has been rejected.';
+    }
+
+    return (
+        <li key={comment.id}>
+            {content}
+        </li>
+    );
+  });
 
   return <ul>{renderedComments}</ul>;
 }   

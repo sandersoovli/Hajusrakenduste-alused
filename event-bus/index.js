@@ -22,9 +22,14 @@ app.post('/events', (req, res) =>{
         console.log('Error forwarding event to comments service:', err.message);
     });
 
-    // UUS LISANDUS: Saada sündmus Query teenusele
+    // Saada sündmus Query teenusele
     axios.post('http://localhost:5002/events', event).catch((err) =>{
         console.log('Error forwarding event to query service:', err.message);
+    });
+
+    // Saada sündmus Moderation teenusele (5003)
+    axios.post('http://localhost:5003/events', event).catch((err) =>{
+        console.log('Error forwarding event to moderation service:', err.message);
     });
 
 

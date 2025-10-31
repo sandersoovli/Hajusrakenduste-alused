@@ -21,7 +21,7 @@ app.post('/posts/:id/comments', async (req, res) => {
   const postId = req.params.id;
 
   const comments = commentsByPostId[postId] || [];
-  const comment = { id: commentId, content };
+  const comment = { id: commentId, content, status: 'pending' };
   comments.push(comment);
   commentsByPostId[postId] = comments;
 
@@ -32,7 +32,8 @@ app.post('/posts/:id/comments', async (req, res) => {
       data: {
         id: commentId,
         content,
-        postId
+        postId,
+        status: 'pending'
       }
     });
   } catch (err) {
@@ -43,15 +44,40 @@ app.post('/posts/:id/comments', async (req, res) => {
 });
 
 // Receive events from the event bus
-app.post('/events', (req, res) => {
+app.post('/events', async (req, res) => { // TEEME FUNKTSIOONI ASÜNKROONSEKS
   const { type, data } = req.body;
 
   if (type === 'PostCreated') {
     commentsByPostId[data.id] = [];
-  }
+  } 
+  
+  // UUS KÄITLEMINE: Kui kommentaar on modereeritud
+  if (type === 'CommentModerated') {
+      const { id, postId, status, content } = data;
+      const comments = commentsByPostId[postId];
+      if (!comments) return res.send({});
 
-  // If you want, you can handle CommentCreated events too
-  // For now we just log them
+      const comment = comments.find(c => c.id === id);
+      if (!comment) return res.send({});
+      
+      // Muuda staatus
+      comment.status = status; 
+      
+      // Saada Event Bus'i teavitus CommentUpdated
+      try {
+          await axios.post('http://localhost:5005/events', {
+              type: 'CommentUpdated',
+              data: {
+                  id,
+                  postId,
+                  status,
+                  content // Saada sisu uuesti kaasa
+              }
+          });
+      } catch (err) {
+          console.log('Error emitting CommentUpdated event:', err.message);
+      }
+  }
   console.log('Received Event:', req.body);
 
   res.send({});

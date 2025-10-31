@@ -48,7 +48,20 @@ const handleEvent = (type, data) => {
         }
     }
 
-    // Tulevased sündmused (nt CommentModerated, CommentUpdated jne) lisatakse siia
+    /// UUS KÄITLEMINE: Kui kommentaari staatus on muutunud (CommentUpdated)
+    if (type === 'CommentUpdated') {
+        const { id, content, postId, status } = data;
+        
+        const post = posts[postId];
+        if (post) {
+            const comment = post.comments.find(c => c.id === id);
+            if (comment) {
+                // Uuenda ainult staatus ja sisu (kui see peaks olema muutunud)
+                comment.status = status; 
+                comment.content = content; 
+            }
+        }
+    }
 };
 
 // ** Tulevikus tuleks lisada sündmuste ajaloo taastamise loogika siia **
