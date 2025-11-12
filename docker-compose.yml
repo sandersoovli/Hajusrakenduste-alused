@@ -1,0 +1,39 @@
+services:
+  posts:
+    build: ./posts
+    ports:
+      - "3001:3001"
+    networks:
+      - microservices-network
+
+  comments:
+    build: ./comments
+    ports:
+      - "5001:5001"
+    networks:
+      - microservices-network
+
+  query:
+    build: ./query
+    ports:
+      - "5002:5002"
+    networks:
+      - microservices-network
+
+  event-bus:
+    build: ./event-bus
+    ports:
+      - "5005:5005"
+    networks:
+      - microservices-network
+
+  moderation:
+    build: ./moderation
+    ports:
+      - "5006:5003"
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge

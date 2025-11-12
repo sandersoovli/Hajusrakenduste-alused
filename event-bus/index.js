@@ -6,40 +6,39 @@ app.use(express.json());
 
 const events = [];
 
-app.post('/events', (req, res) =>{
-    const event = req.body;
-    events.push(event);
+app.post('/events', (req, res) => {
+  const event = req.body;
+  events.push(event);
 
-    console.log('Received Event:', event.type);
+  console.log('Received Event:', event.type);
 
-    // Saada sündmus Postituste teenusele
-    axios.post('http://localhost:5000/events', event).catch((err) =>{
-        console.log('Error forwarding event to posts service:', err.message);
-    });
+  // Saada sündmus Postituste teenusele
+  axios.post('http://posts:3001/events', event).catch((err) => {
+    console.log('Error forwarding event to posts service:', err.message);
+  });
 
-    // Saada sündmus Kommentaaride teenusele
-    axios.post('http://localhost:5001/events', event).catch((err) =>{
-        console.log('Error forwarding event to comments service:', err.message);
-    });
+  // Saada sündmus Kommentaaride teenusele
+  axios.post('http://comments:5001/events', event).catch((err) => {
+    console.log('Error forwarding event to comments service:', err.message);
+  });
 
-    // Saada sündmus Query teenusele
-    axios.post('http://localhost:5002/events', event).catch((err) =>{
-        console.log('Error forwarding event to query service:', err.message);
-    });
+  // Saada sündmus Query teenusele
+  axios.post('http://query:5002/events', event).catch((err) => {
+    console.log('Error forwarding event to query service:', err.message);
+  });
 
-    // Saada sündmus Moderation teenusele (5003)
-    axios.post('http://localhost:5003/events', event).catch((err) =>{
-        console.log('Error forwarding event to moderation service:', err.message);
-    });
+  // Kui lisad tulevikus moderation-teenuse:
+  axios.post('http://moderation:5003/events', event).catch((err) => {
+    console.log('Error forwarding event to moderation service:', err.message);
+  });
 
-
-    res.json({ status: 'OK' });
+  res.json({ status: 'OK' });
 });
 
-app.get('/events', (req, res) =>{
-    res.json(events);
+app.get('/events', (req, res) => {
+  res.json(events);
 });
 
-app.listen(5005, () =>{
-    console.log('event-bus  service running on http://localhost:5005');
+app.listen(5005, () => {
+  console.log('Event-bus service running on http://localhost:5005');
 });

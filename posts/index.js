@@ -17,38 +17,35 @@ app.get('/posts', (req, res) => {
   res.json(posts);
 });
 
-app.post('/posts', (req, res) => {
+app.post('/posts', async (req, res) => {
   const id = randomBytes(4).toString('hex');
   const title = req.body.title;
-  const post = {
-    id: id,
-    title
-  };
-  
+  const post = { id, title };
+  posts.push(post);
 
-  axios.post('http://localhost:5005/events', {
-    type: 'PostCreated',
-    data: post
-  }).catch((err) =>{
+  try {
+    await axios.post('http://event-bus:5005/events', {
+      type: 'PostCreated',
+      data: post,
+    });
+  } catch (err) {
     console.log('Error emitting event to event bus:', err.message);
-
-  });
+  }
 
   res.status(201).json(post);
 });
 
 app.post('/events', (req, res) => {
-  const{type, data} = req.body;
+  const { type, data } = req.body;
 
   if (type === 'PostCreated') {
     posts.push(data);
-  } 
+  }
 
   console.log('Received Event:', req.body);
   res.send({});
 });
 
-
-app.listen(5000, () => {
-  console.log('Posts service running on http://localhost:5000');
+app.listen(3001, () => {
+  console.log('Posts service running on http://localhost:3001');
 });

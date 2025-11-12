@@ -9,10 +9,14 @@ const PostCreate = () => {
     }
 
     const onSubmit = async (event) => {
-        event.preventDefault();
-        await axios.post('http://localhost:5000/posts', { title });
+    event.preventDefault();
+    try {
+        await axios.post('http://localhost:3001/posts', { title });
         setTitle('');
+    } catch (err) {
+        console.error('Error creating post:', err);
     }
+}
 
     return (
         <div>
