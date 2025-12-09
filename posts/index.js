@@ -8,6 +8,7 @@ app.use(express.json());
 app.use(cors({ origin: 'http://localhost:3000' }));
 
 const posts = [];
+const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => {
   res.send('Posts service running!');
@@ -46,6 +47,7 @@ app.post('/events', (req, res) => {
   res.send({});
 });
 
-app.listen(3001, () => {
-  console.log('Posts service running on http://localhost:3001');
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on http://0.0.0.0:${PORT}`);
 });

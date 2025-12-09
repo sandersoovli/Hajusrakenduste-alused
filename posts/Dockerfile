@@ -12,7 +12,7 @@ RUN npm install
 COPY . .
 
 # Avame teenuse porti
-EXPOSE 3000
+EXPOSE 5000
 
 # Käivitame rakenduse
 CMD ["npm", "start"]

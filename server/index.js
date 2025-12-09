@@ -51,7 +51,13 @@ app.post('/posts/:id/comments', (req, res) => {
     res.status(201).json({ comment });
 });
 
+const PORT = process.env.PORT || 5000;
 
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on http://0.0.0.0:${PORT}`);
+});
+/*
 app.listen(5000, () => {
     console.log('Server is running on http://localhost:5000');
 });
+*/
