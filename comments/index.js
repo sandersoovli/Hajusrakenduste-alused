@@ -26,7 +26,7 @@ app.post('/posts/:id/comments', async (req, res) => {
   commentsByPostId[postId] = comments;
 
   try {
-    await axios.post('http://event-bus:5005/events', {
+    await axios.post('http://event-bus-srv:5005/events', {
       type: 'CommentCreated',
       data: { id: commentId, content, postId, status: 'pending' },
     });
@@ -56,7 +56,7 @@ app.post('/events', async (req, res) => {
     comment.status = status;
 
     try {
-      await axios.post('http://event-bus:5005/events', {
+      await axios.post('http://event-bus-srv:5005/events', {
         type: 'CommentUpdated',
         data: { id, postId, status, content },
       });
@@ -69,6 +69,6 @@ app.post('/events', async (req, res) => {
   res.send({});
 });
 
-app.listen(5001, () => {
-  console.log('Comments service running on http://localhost:5001');
+app.listen(5001, '0.0.0.0', () => {
+  console.log('Comments service running on http://0.0.0.0:5001');
 });

@@ -12,7 +12,7 @@ RUN npm install
 COPY . .
 
 # Expose port (sama mis app.listen)
-EXPOSE 5000
+EXPOSE 5002
 
 # Start the app
 CMD ["node", "index.js"]
