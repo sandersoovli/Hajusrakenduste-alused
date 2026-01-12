@@ -2,21 +2,21 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: blog-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - blog.local
+      secretName: blog-tls
   rules:
     - host: blog.local
       http:
         paths:
-          # React klient
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: client-srv
-                port:
-                  number: 3000
-          # Posti loomine
+          # Posti loomine (kõige spetsiifilisem)
           - path: /posts/create
             pathType: Prefix
             backend:
@@ -24,15 +24,15 @@ spec:
                 name: posts-srv
                 port:
                   number: 5000
-          # Kommentaaride lisamine
-          - path: /posts/
-            pathType: Prefix
+          # Kommentaaride lisamine (regex path)
+          - path: /posts/.*/comments
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: comments-srv
                 port:
                   number: 5001
-          # Postituste ja kommentaaride koondvaade
+          # Postituste ja kommentaaride koondvaade (üldine)
           - path: /posts
             pathType: Prefix
             backend:
@@ -40,3 +40,11 @@ spec:
                 name: query-srv
                 port:
                   number: 5002
+          # React klient (kõige üldisem)
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: client-srv
+                port:
+                  number: 3000

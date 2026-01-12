@@ -3,7 +3,25 @@ const cors = require('cors');
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:3000' }));
+
+const allowedOrigins = [
+  "https://blog.local",
+  "http://blog.local",
+  "http://localhost:3000",
+];
+
+const corsOptions = {
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error("CORS blocked: " + origin));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: false,
+};
+
+app.use(cors(corsOptions));
 
 const posts = {};
 
@@ -58,6 +76,6 @@ app.post('/events', (req, res) => {
   res.send({});
 });
 
-app.listen(5002, () => {
-  console.log('Query service running on http://localhost:5002');
+app.listen(5002, '0.0.0.0', () => {
+  console.log('Query service running on http://0.0.0.0:5002');
 });
