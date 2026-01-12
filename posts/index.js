@@ -18,7 +18,7 @@ app.get('/posts', (req, res) => {
   res.json(posts);
 });
 
-app.post('/posts', async (req, res) => {
+const createPost = async (req, res) => {
   const id = randomBytes(4).toString('hex');
   const title = req.body.title;
   const post = { id, title };
@@ -34,7 +34,12 @@ app.post('/posts', async (req, res) => {
   }
 
   res.status(201).json(post);
-});
+};
+
+// Support original path
+app.post('/posts', createPost);
+// Support ingress-routed create path
+app.post('/posts/create', createPost);
 
 app.post('/events', (req, res) => {
   const { type, data } = req.body;

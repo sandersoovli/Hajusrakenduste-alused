@@ -11,7 +11,7 @@ const PostCreate = () => {
     const onSubmit = async (event) => {
     event.preventDefault();
     try {
-        await axios.post('http://localhost:3001/posts', { title });
+        await axios.post('/posts/create', { title });
         setTitle('');
     } catch (err) {
         console.error('Error creating post:', err);

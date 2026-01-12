@@ -10,7 +10,7 @@ const PostList = () => {
         const fetchPosts = async () => {
             try {
                 // MUUTUS 1: Pärime andmed Query-teenuselt (5002)
-                const res = await axios.get('http://localhost:5002/posts'); 
+                const res = await axios.get('/posts'); 
                 setPosts(res.data);
             } catch (err) {
                 console.error(err);
