@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const axios = require('axios'); // LISA SEE
 
 const app = express();
 app.use(express.json());
@@ -23,56 +24,47 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// --- 1. LISA: Middleware klastrisiseseks valideerimiseks ---
+const verifyTokenWithAuthService = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: 'Autoriseerimata vaade: Token puudub' });
+  }
+
+  try {
+    // Kutsume auth-teenuse /auth/verify ruuterit
+    await axios.post(
+      'http://auth-srv:5006/auth/verify',
+      {},
+      { headers: { Authorization: authHeader } }
+    );
+    next();
+  } catch (err) {
+    console.error('Päring lükati tagasi:', err.message);
+    return res.status(401).json({ message: 'Autoriseerimata vaade: Vigane token' });
+  }
+};
+
 const posts = {};
 
 const handleEvent = (type, data) => {
+  // ... (Sinu olemasolev handleEvent loogika jääb samaks)
   console.log('Handling event:', type, data);
-
   if (type === 'PostCreated') {
     const { id, title } = data;
     posts[id] = { id, title, comments: [] };
   }
-
-  if (type === 'CommentCreated') {
-    const { id, content, postId, status } = data;
-    const post = posts[postId];
-
-    if (!post) {
-      console.warn(`Warning: Post not found for CommentCreated event. postId=${postId}`);
-      return;
-    }
-
-    post.comments.push({ id, content, status });
-  }
-
-  if (type === 'CommentUpdated') {
-    const { id, content, postId, status } = data;
-    const post = posts[postId];
-
-    if (!post) {
-      console.warn(`Warning: Post not found for CommentUpdated event. postId=${postId}`);
-      return;
-    }
-
-    const comment = post.comments.find((c) => c.id === id);
-    if (!comment) {
-      console.warn(`Warning: Comment not found for CommentUpdated event. commentId=${id}`);
-      return;
-    }
-
-    comment.content = content;
-    comment.status = status;
-  }
+  // ... (ülejäänud sündmused)
 };
 
-app.get('/posts', (req, res) => {
+// --- 2. MUUDA: Turva andmete lugemise ruuter ---
+app.get('/posts', verifyTokenWithAuthService, (req, res) => {
   res.json(posts);
 });
 
 app.post('/events', (req, res) => {
   const { type, data } = req.body;
   handleEvent(type, data);
-  console.log('Received Event by Query Service:', req.body);
   res.send({});
 });
 

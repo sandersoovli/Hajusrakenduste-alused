@@ -3,17 +3,17 @@ title: Posts Service
 ---
 This service handles blog posts for the application. It provides the following functionalities:
 
-1. Retrieve all posts (`GET /posts`)
+1. Retrieve all posts (<SwmPath>[posts/](/posts/)</SwmPath>)
 
-2. Create a new post (`POST /posts`) and emit an event to the event bus
+2. Create a new post (<SwmPath>[posts/](/posts/)</SwmPath>) and emit an event to the event bus
 
-3. Receive events from the event bus (`POST /events`)
+3. Receive events from the event bus (<SwmToken path="/posts/index.js" pos="21:11:11" line-data="  methods: [&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;],">`POST`</SwmToken>` `<SwmToken path="/posts/index.js" pos="46:17:18" line-data="    await axios.post(&#39;http://event-bus-srv:5005/events&#39;, {">`/events`</SwmToken>)
 
-Posts are currently stored in memory. Each post has a unique `id` and a `title`.
+Posts are currently stored in memory. Each post has a unique <SwmToken path="/posts/index.js" pos="40:3:3" line-data="  const id = randomBytes(4).toString(&#39;hex&#39;);">`id`</SwmToken> and a <SwmToken path="/posts/index.js" pos="41:3:3" line-data="  const title = req.body.title;">`title`</SwmToken>.
 
-1. Retrieve all posts (`GET /posts`)
+1. Retrieve all posts (<SwmPath>[posts/](/posts/)</SwmPath>)
 
-<SwmSnippet path="/posts/index.js" line="16">
+<SwmSnippet path="/posts/index.js" line="35">
 
 ---
 
@@ -29,23 +29,27 @@ app.get('/posts', (req, res) => {
 
 </SwmSnippet>
 
-2. Create a new post (`POST /posts`) and emit an event to the event bus
+2. Create a new post (<SwmPath>[posts/](/posts/)</SwmPath>) and emit an event to the event bus
 
-<SwmSnippet path="/posts/index.js" line="20">
+<SwmSnippet path="/posts/index.js" line="35">
 
 ---
 
 &nbsp;
 
 ```javascript
-app.post('/posts', async (req, res) => {
+app.get('/posts', (req, res) => {
+  res.json(posts);
+});
+
+const createPost = async (req, res) => {
   const id = randomBytes(4).toString('hex');
   const title = req.body.title;
   const post = { id, title };
   posts.push(post);
 
   try {
-    await axios.post('http://event-bus:5005/events', {
+    await axios.post('http://event-bus-srv:5005/events', {
       type: 'PostCreated',
       data: post,
     });
@@ -54,16 +58,16 @@ app.post('/posts', async (req, res) => {
   }
 
   res.status(201).json(post);
-});
+};
 ```
 
 ---
 
 </SwmSnippet>
 
-3. Receive events from the event bus (`POST /events`)
+3. Receive events from the event bus (<SwmToken path="/posts/index.js" pos="21:11:11" line-data="  methods: [&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;],">`POST`</SwmToken>` `<SwmToken path="/posts/index.js" pos="46:17:18" line-data="    await axios.post(&#39;http://event-bus-srv:5005/events&#39;, {">`/events`</SwmToken>)
 
-<SwmSnippet path="/posts/index.js" line="38">
+<SwmSnippet path="/posts/index.js" line="62">
 
 ---
 
@@ -89,7 +93,6 @@ app.post('/events', (req, res) => {
 ### **Steps / How to Run and Test**
 
 1. Open terminal and navigate to posts service folder: <SwmPath>[posts/](/posts/)</SwmPath>
-
 
 2. Install dependencies:
 
@@ -123,7 +126,7 @@ curl -X POST http://localhost:3001/posts \
 
 ```
 
-**Send a PostCreated event manually (optional):**
+**Send a** <SwmToken path="/posts/index.js" pos="47:5:5" line-data="      type: &#39;PostCreated&#39;,">`PostCreated`</SwmToken> **event manually (optional):**
 
 ```plaintext
 curl -X POST http://localhost:3001/events \
@@ -135,7 +138,7 @@ curl -X POST http://localhost:3001/events \
 
 - Posts are stored in memory; restarting the service will clear them.
 
-- Each new post triggers a `PostCreated` event to the Event Bus.
+- Each new post triggers a <SwmToken path="/posts/index.js" pos="47:5:5" line-data="      type: &#39;PostCreated&#39;,">`PostCreated`</SwmToken> event to the Event Bus.
 
 - Future improvements: database storage, validation, authentication.
 

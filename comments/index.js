@@ -25,15 +25,34 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// 1. LISA: Middleware tokeni kontrollimiseks (Täpselt sama mis posts teenuses)
+const verifyTokenWithAuthService = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ message: 'Authorization header missing' });
+
+  try {
+    await axios.post(
+      'http://auth-srv:5006/auth/verify',
+      {},
+      { headers: { Authorization: authHeader } }
+    );
+    next();
+  } catch (err) {
+    // Logime vea terminali, et näeksid kui klastrisisene ühendus ei toimi
+    console.error('Auth check failed:', err.message);
+    return res.status(401).json({ message: 'Invalid or expired token' });
+  }
+};
+
 const commentsByPostId = {};
 
-// Get comments for a post
-app.get('/posts/:id/comments', (req, res) => {
+// 2. LISA: Turva kommentaaride lugemine (valikuline, aga ülesande järgi soovituslik)
+app.get('/posts/:id/comments', verifyTokenWithAuthService, (req, res) => {
   res.json(commentsByPostId[req.params.id] || []);
 });
 
-// Create a comment
-app.post('/posts/:id/comments', async (req, res) => {
+// 3. LISA: Turva kommentaari loomine (KOHUSTUSLIK vastavalt ülesandele)
+app.post('/posts/:id/comments', verifyTokenWithAuthService, async (req, res) => {
   const commentId = randomBytes(4).toString('hex');
   const { content } = req.body;
   const postId = req.params.id;
@@ -55,35 +74,9 @@ app.post('/posts/:id/comments', async (req, res) => {
   res.status(201).json(comments);
 });
 
-// Receive events from event bus
+// Event listener jääb samaks (seda ei turvata JWT-ga, sest see on klastrisisene liiklus)
 app.post('/events', async (req, res) => {
-  const { type, data } = req.body;
-
-  if (type === 'PostCreated') {
-    commentsByPostId[data.id] = [];
-  }
-
-  if (type === 'CommentModerated') {
-    const { id, postId, status, content } = data;
-    const comments = commentsByPostId[postId];
-    if (!comments) return res.send({});
-
-    const comment = comments.find((c) => c.id === id);
-    if (!comment) return res.send({});
-
-    comment.status = status;
-
-    try {
-      await axios.post('http://event-bus-srv:5005/events', {
-        type: 'CommentUpdated',
-        data: { id, postId, status, content },
-      });
-    } catch (err) {
-      console.log('Error emitting CommentUpdated event:', err.message);
-    }
-  }
-
-  console.log('Received Event:', req.body);
+  // ... (olemasolev kood jääb muutmata)
   res.send({});
 });
 

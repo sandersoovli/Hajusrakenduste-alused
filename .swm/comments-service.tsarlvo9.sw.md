@@ -3,21 +3,21 @@ title: Comments Service
 ---
 The Comments service manages comments for blog posts. It has the following functionalities:
 
-1. Retrieve all comments for a post (`GET /posts/:id/comments`)
+1. Retrieve all comments for a post (<SwmPath>[comments/](/comments/)</SwmPath>)
 
-2. Create a comment for a post (`POST /posts/:id/comments`) and emit a `CommentCreated` event
+2. Create a comment for a post (<SwmPath>[comments/](/comments/)</SwmPath>) and emit a <SwmToken path="/comments/index.js" pos="48:5:5" line-data="      type: &#39;CommentCreated&#39;,">`CommentCreated`</SwmToken> event
 
-3. Receive events from the Event Bus (`POST /events`) and react accordingly:
+3. Receive events from the Event Bus (<SwmToken path="/comments/index.js" pos="21:11:11" line-data="  methods: [&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;],">`POST`</SwmToken>` `<SwmToken path="/comments/index.js" pos="47:17:18" line-data="    await axios.post(&#39;http://event-bus-srv:5005/events&#39;, {">`/events`</SwmToken>) and react accordingly:
 
-   - `PostCreated` → initialize empty comments for new post
+   - <SwmToken path="/comments/index.js" pos="62:9:9" line-data="  if (type === &#39;PostCreated&#39;) {">`PostCreated`</SwmToken> → initialize empty comments for new post
 
-   - `CommentModerated` → update comment status and emit `CommentUpdated` event
+   - <SwmToken path="/comments/index.js" pos="66:9:9" line-data="  if (type === &#39;CommentModerated&#39;) {">`CommentModerated`</SwmToken> → update comment status and emit <SwmToken path="/comments/index.js" pos="78:5:5" line-data="        type: &#39;CommentUpdated&#39;,">`CommentUpdated`</SwmToken> event
 
-All comments are currently stored in memory in the `commentsByPostId` object.
+All comments are currently stored in memory in the <SwmToken path="/comments/index.js" pos="32:5:5" line-data="  res.json(commentsByPostId[req.params.id] || []);">`commentsByPostId`</SwmToken> object.
 
-1. Retrieve all comments for a post (`GET /posts/:id/comment`
+1. Retrieve all comments for a post (<SwmToken path="/comments/index.js" pos="21:6:6" line-data="  methods: [&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;],">`GET`</SwmToken>` `<SwmPath>[posts/](/posts/)</SwmPath>`:id/comment`
 
-<SwmSnippet path="/comments/index.js" line="13">
+<SwmSnippet path="/comments/index.js" line="31">
 
 ---
 
@@ -33,9 +33,9 @@ app.get('/posts/:id/comments', (req, res) => {
 
 </SwmSnippet>
 
-2. Create a comment for a post (`POST /posts/:id/comments`) and emit a `CommentCreated` event
+2. Create a comment for a post (<SwmPath>[comments/](/comments/)</SwmPath>) and emit a <SwmToken path="/comments/index.js" pos="48:5:5" line-data="      type: &#39;CommentCreated&#39;,">`CommentCreated`</SwmToken> event
 
-<SwmSnippet path="/comments/index.js" line="18">
+<SwmSnippet path="/comments/index.js" line="36">
 
 ---
 
@@ -53,7 +53,7 @@ app.post('/posts/:id/comments', async (req, res) => {
   commentsByPostId[postId] = comments;
 
   try {
-    await axios.post('http://event-bus:5005/events', {
+    await axios.post('http://event-bus-srv:5005/events', {
       type: 'CommentCreated',
       data: { id: commentId, content, postId, status: 'pending' },
     });
@@ -69,13 +69,13 @@ app.post('/posts/:id/comments', async (req, res) => {
 
 </SwmSnippet>
 
-3. Receive events from the Event Bus (`POST /events`) and react accordingly:
+3. Receive events from the Event Bus (<SwmToken path="/comments/index.js" pos="21:11:11" line-data="  methods: [&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;],">`POST`</SwmToken>` `<SwmToken path="/comments/index.js" pos="47:17:18" line-data="    await axios.post(&#39;http://event-bus-srv:5005/events&#39;, {">`/events`</SwmToken>) and react accordingly:
 
-- `PostCreated` → initialize empty comments for new post
+- <SwmToken path="/comments/index.js" pos="62:9:9" line-data="  if (type === &#39;PostCreated&#39;) {">`PostCreated`</SwmToken> → initialize empty comments for new post
 
-- `CommentModerated` → update comment status and emit `CommentUpdated` event
+- <SwmToken path="/comments/index.js" pos="66:9:9" line-data="  if (type === &#39;CommentModerated&#39;) {">`CommentModerated`</SwmToken> → update comment status and emit <SwmToken path="/comments/index.js" pos="78:5:5" line-data="        type: &#39;CommentUpdated&#39;,">`CommentUpdated`</SwmToken> event
 
-<SwmSnippet path="/comments/index.js" line="41">
+<SwmSnippet path="/comments/index.js" line="59">
 
 ---
 
@@ -100,7 +100,7 @@ app.post('/events', async (req, res) => {
     comment.status = status;
 
     try {
-      await axios.post('http://event-bus:5005/events', {
+      await axios.post('http://event-bus-srv:5005/events', {
         type: 'CommentUpdated',
         data: { id, postId, status, content },
       });
@@ -122,7 +122,7 @@ app.post('/events', async (req, res) => {
 
 1. Navigate to the comments service folder:
 
-```plaintext
+```
 cd comments
 
 ```
@@ -169,11 +169,11 @@ curl -X POST http://localhost:5001/events \
 
 **Explanation:**
 
-- `Posts Service` emits `PostCreated` → `Comments Service` initializes comments for the new post.
+- `Posts Service` emits <SwmToken path="/comments/index.js" pos="62:9:9" line-data="  if (type === &#39;PostCreated&#39;) {">`PostCreated`</SwmToken> → <SwmToken path="/comments/index.js" pos="91:6:6" line-data="  console.log(&#39;Comments service running on http://0.0.0.0:5001&#39;);">`Comments`</SwmToken>` Service` initializes comments for the new post.
 
-- New comments emit `CommentCreated` → sent to Event Bus.
+- New comments emit <SwmToken path="/comments/index.js" pos="48:5:5" line-data="      type: &#39;CommentCreated&#39;,">`CommentCreated`</SwmToken> → sent to Event Bus.
 
-- Moderator service sends `CommentModerated` → `Comments Service` updates status and emits `CommentUpdated`.
+- Moderator service sends <SwmToken path="/comments/index.js" pos="66:9:9" line-data="  if (type === &#39;CommentModerated&#39;) {">`CommentModerated`</SwmToken> → <SwmToken path="/comments/index.js" pos="91:6:6" line-data="  console.log(&#39;Comments service running on http://0.0.0.0:5001&#39;);">`Comments`</SwmToken>` Service` updates status and emits <SwmToken path="/comments/index.js" pos="78:5:5" line-data="        type: &#39;CommentUpdated&#39;,">`CommentUpdated`</SwmToken>.
 
 - Frontend interacts with Comments Service via GET and POST endpoints.
 
@@ -181,9 +181,9 @@ curl -X POST http://localhost:5001/events \
 
 - Comments are stored in memory; restarting the service will clear them.
 
-- Each new comment emits a `CommentCreated` event to the Event Bus.
+- Each new comment emits a <SwmToken path="/comments/index.js" pos="48:5:5" line-data="      type: &#39;CommentCreated&#39;,">`CommentCreated`</SwmToken> event to the Event Bus.
 
-- Comments can be moderated externally; `CommentModerated` events update the status.
+- Comments can be moderated externally; <SwmToken path="/comments/index.js" pos="66:9:9" line-data="  if (type === &#39;CommentModerated&#39;) {">`CommentModerated`</SwmToken> events update the status.
 
 - Logs show all received events for easier debugging.
 

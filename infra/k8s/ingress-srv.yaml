@@ -16,6 +16,14 @@ spec:
     - host: blog.local
       http:
         paths:
+        # 1. Auth teenus (LISA SEE!)
+          - path: /auth/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: auth-srv
+                port:
+                  number: 5006
           # Posti loomine (kõige spetsiifilisem)
           - path: /posts/create
             pathType: Prefix
